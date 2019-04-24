@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-service
+spec:
+  ports:
+  - port: 31001					#The port is 31001 which represents that wordpress-service can be accessed by other services in the cluster at port 31001
+    nodePort: 31001				#exposed external to local host machine
+    targetPort: http-port			#service is actually running on port 80 on pods
+    protocol: TCP
+  selector:
+    app: wordpress
+#  type: LoadBalancer
+  type: NodePort
