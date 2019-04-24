@@ -1,0 +1,63 @@
+Google cloud platform
+
+1. gcloud init
+2. login with ur gmail account
+3. get credentials for your cluster
+
+	root@pwned:~/gcp# gcloud container clusters get-credentials aks-cluster --zone asia-south1-b --project steel-time-238619
+	
+	Fetching cluster endpoint and auth data.
+	kubeconfig entry generated for aks-cluster.
+	root@pwned:~/gcp# kubectl config view
+	apiVersion: v1
+	clusters:
+	- cluster:
+	    certificate-authority-data: DATA+OMITTED
+	    server: https://35.200.185.60
+	  name: gke_steel-time-238619_asia-south1-b_aks-cluster
+	- cluster:
+	    certificate-authority: /root/.minikube/ca.crt
+	    server: https://192.168.99.100:8443
+	  name: minikube
+	contexts:
+	- context:
+	    cluster: gke_steel-time-238619_asia-south1-b_aks-cluster
+	    user: gke_steel-time-238619_asia-south1-b_aks-cluster
+	  name: gke_steel-time-238619_asia-south1-b_aks-cluster
+	- context:
+	    cluster: minikube
+	    user: minikube
+	  name: minikube
+	current-context: gke_steel-time-238619_asia-south1-b_aks-cluster
+	kind: Config
+	preferences: {}
+	users:
+	- name: gke_steel-time-238619_asia-south1-b_aks-cluster
+	  user:
+	    auth-provider:
+	      config:
+	        cmd-args: config config-helper --format=json
+	        cmd-path: /root/gcp/google-cloud-sdk/bin/gcloud
+	        expiry-key: '{.credential.token_expiry}'
+	        token-key: '{.credential.access_token}'
+	      name: gcp
+	- name: minikube
+	  user:
+	    client-certificate: /root/.minikube/client.crt
+	    client-key: /root/.minikube/client.key
+
+
+	root@pwned:~/gcp# kubectl config current-context
+	gke_steel-time-238619_asia-south1-b_aks-cluster
+	root@pwned:~/gcp# kubectl get ns
+	NAME          STATUS   AGE
+	default       Active   12m
+	kube-public   Active   12m
+	kube-system   Active   12m
+	root@pwned:~/gcp# kubectl get nodes
+	NAME                                   STATUS   ROLES    AGE   VERSION
+	gke-aks-cluster-pool-1-b0faf032-2glh   Ready    <none>   11m   v1.12.6-gke.10
+	gke-aks-cluster-pool-1-b0faf032-4drt   Ready    <none>   11m   v1.12.6-gke.10
+	gke-aks-cluster-pool-1-b0faf032-57tb   Ready    <none>   11m   v1.12.6-gke.10
+
+
