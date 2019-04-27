@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: app-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+#    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  azureDisk:
+    diskName: app_ad
+    diskURI: /subscriptions/xxxx/resourceGroups/rg_name/providers/Microsoft.Compute/disks/app_ad
+    kind: Managed
+    fsType: ext4 

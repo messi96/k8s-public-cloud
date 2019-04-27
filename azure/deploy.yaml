@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: app-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-app
+    spec:
+#      securityContext:         #https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for volume-access
+#        fsGroup: 200
+      initContainers:
+      - name: volume-mount-hack
+        image: <my_jar_image>         #can be any image, it is just a init container to change permissions of a volume
+        command: ["sh", "-c", "chown -R 94999:94999 /home/test_pv"]
+        volumeMounts:
+        - name: app-data
+          mountPath: /home/test_pv
+      containers:
+      - name: app-container
+        image: <my_jar_image>
+        imagePullPolicy: IfNotPresent
+        command: ["./service_startup.sh"]
+#        command: ["tail","-f","/etc/hosts"]
+#        commmand: ["/bin/sh", "-c", "sleep 50000"]
+        resources:
+          requests:
+            memory: "256Mi"
+          limits:
+            memory: "4Gi"
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port : 8080
+          initialDelaySeconds: 15
+          timeoutSeconds: 30
+        volumeMounts:                   #Secret as a file using volume-mount
+        - name: kvvolume
+          mountPath: /home/app/secrets
+          readOnly: true
+        - name: app-data
+          mountPath: /home/app/test_pv
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+      - name: app-data
+        persistentVolumeClaim: 
+          claimName: app-pvc
+      - name: kvvolume
+        flexVolume:
+          driver: "azure/kv"
+          secretRef:
+            name: kvcreds
+          options:
+            usepodidentity: "false"       #this will tell the driver to use an Azure AD pod identity, if false using SPN for authentication
+            keyvaultname: "myvault"
+            keyvaultobjectnames: "keystore;secret1"
+            keyvaultobjecttypes: "secret;secret"
+            resourcegroup: "rg_name"
+            subscriptionid: "xxxXX"
+            tenantid: "xxxxxxx"
